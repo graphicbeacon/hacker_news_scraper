@@ -1,26 +1,18 @@
-import 'dart:io';
 import 'dart:convert';
 
+import 'package:http/http.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart';
 
-initiate() async {
-  // Create HttpClient
-  HttpClientRequest client =
-      await HttpClient().getUrl(Uri.parse('https://news.ycombinator.com'));
-
+Future initiate(BaseClient client) async {
   // Make API call to Hackernews homepage
-  HttpClientResponse response = await client.close();
+  Response response = await client.get('https://news.ycombinator.com');
+
+  if (response.statusCode != 200) return response.body;
 
   // Use html parser
-  var markup = '';
-
-  await for (var data in response.transform(Utf8Decoder())) {
-    markup += data;
-  }
-
-  var document = parse(markup);
-  List<Element> links = document.querySelectorAll('td.title a.storylink');
+  var document = parse(response.body);
+  List<Element> links = document.querySelectorAll('td.title > a.storylink');
   List<Map<String, dynamic>> linkMap = [];
 
   for (var link in links) {
@@ -30,6 +22,5 @@ initiate() async {
     });
   }
 
-  // Output
-  print(json.encode(linkMap));
+  return json.encode(linkMap);
 }

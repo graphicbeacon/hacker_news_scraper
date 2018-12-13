@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   html: ^0.13.3+3
+  http: ^0.12.0
 
 dev_dependencies:
   test: ^1.0.0
